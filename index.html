@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
     <title>Судоку</title>
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,25 +25,29 @@
             --font-family: 'Montserrat', sans-serif;
         }
 
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            overflow: hidden;
+            position: fixed;
+        }
+
         body {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
             font-family: var(--font-family);
             background-color: var(--bg-color-light);
             color: var(--text-color-light);
             transition: background-color 0.4s, color 0.4s;
-            padding: 1rem;
             box-sizing: border-box;
             /* Disable user interactions */
             user-select: none;
             -webkit-user-select: none;
             -ms-user-select: none;
-            touch-action: none;
-            overflow: hidden;
+            touch-action: manipulation;
         }
 
         body.dark {
@@ -53,9 +57,11 @@
 
         #app-container {
             width: 100%;
-            height: 100vh;
+            height: 100%;
             display: flex;
             flex-direction: column;
+            padding: 1rem;
+            box-sizing: border-box;
         }
 
         #main-content {
@@ -63,23 +69,38 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: auto;
+            overflow: hidden; /* Prevent scrolling in the main area */
+            width: 100%;
         }
 
         #menu, #game {
             display: none;
             text-align: center;
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.5s ease, transform 0.5s ease;
             width: 100%;
             max-width: 500px;
+            transform: scale(0.95);
+        }
+
+        #menu.active, #game.active {
+            display: flex; /* Use flex for centering */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        #game.active {
+            height: 100%;
         }
 
         h1 {
-            font-size: clamp(2.5rem, 8vw, 3.5rem);
+            font-size: clamp(2.2rem, 7vw, 3rem);
             font-weight: 700;
             color: var(--primary-color);
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             text-shadow: 2px 2px 4px var(--shadow-color);
         }
 
@@ -90,7 +111,7 @@
         /* --- Buttons --- */
         .btn {
             font-family: var(--font-family);
-            font-size: 1rem;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
             font-weight: 600;
             padding: 12px 20px;
             border-radius: 12px;
@@ -100,7 +121,7 @@
             box-shadow: 0 4px 6px var(--shadow-color), 0 1px 3px var(--shadow-color);
             background-color: var(--surface-color-light);
             color: var(--primary-color);
-            margin: 8px 0;
+            margin: 6px 0;
             width: 80%;
             max-width: 300px;
         }
@@ -127,7 +148,7 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 8px 16px var(--shadow-color);
-            margin: 20px auto;
+            margin: 15px auto;
             background-color: var(--surface-color-light);
             width: 100%;
             max-width: 500px;
@@ -150,7 +171,7 @@
             height: 11.11%;
             text-align: center;
             border: 1px solid var(--border-color-light);
-            font-size: clamp(1rem, 4vw, 1.5rem);
+            font-size: clamp(0.9rem, 4vw, 1.5rem);
             cursor: pointer;
             transition: background-color 0.2s;
             font-weight: 600;
@@ -200,17 +221,17 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         .icon-btn {
             background: var(--surface-color-light);
             border: none;
-            font-size: 1.5rem;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
             cursor: pointer;
             color: var(--text-color-light);
             transition: all 0.2s;
-            width: 44px;
-            height: 44px;
+            width: clamp(38px, 8vw, 44px);
+            height: clamp(38px, 8vw, 44px);
             border-radius: 50%;
             display: flex;
             justify-content: center;
@@ -237,23 +258,22 @@
              padding: 8px 12px;
              border-radius: 8px;
              box-shadow: 0 2px 4px var(--shadow-color);
-             font-size: 0.9rem;
+             font-size: clamp(0.7rem, 2vw, 0.9rem);
         }
         body.dark #lives, body.dark #difficulty, body.dark #time {
             background-color: var(--surface-color-dark);
         }
 
         #number-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin: 20px 0;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: clamp(6px, 2vw, 10px);
+            margin: 15px 0;
         }
         .number-btn {
-            width: clamp(38px, 9vw, 42px);
-            height: clamp(38px, 9vw, 42px);
-            font-size: 1.5rem;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
             font-weight: 600;
             color: var(--primary-color);
             background-color: var(--surface-color-light);
@@ -280,15 +300,6 @@
             color: var(--bg-color-dark);
             border-color: #a7c7fa;
         }
-        
-        @media (max-width: 400px) {
-            #number-buttons {
-                display: grid;
-                grid-template-columns: repeat(5, 1fr);
-                gap: 8px;
-            }
-        }
-
 
         /* --- Modals --- */
         .modal {
@@ -438,7 +449,7 @@
 <body>
     <div id="app-container">
         <div id="main-content">
-            <div id="menu">
+            <div id="menu" class="active">
                 <h1>Судоку</h1>
                 <div id="difficulty-buttons">
                     <button class="btn" onclick="startGame('easy')">Легкий</button>
@@ -582,13 +593,9 @@
         const statsModal = document.getElementById('stats-modal');
 
         // --- Initialization ---
-        showMenu();
-        setTimeout(() => {
-            menuEl.style.opacity = '1';
-            menuEl.style.display = 'block';
-        }, 100);
         initStats();
         generateNumberButtons();
+        showMenu(); // Show menu on start
 
         function generateNumberButtons() {
             numberButtonsEl.innerHTML = ''; // Clear previous buttons
@@ -609,12 +616,8 @@
         // --- Game Flow ---
         function showMenu() {
             [winModal, gameOverModal, pauseModal, rulesModal, statsModal].forEach(modal => modal.style.display = 'none');
-            gameEl.style.opacity = '0';
-            menuEl.style.display = 'block';
-            setTimeout(() => {
-                gameEl.style.display = 'none';
-                menuEl.style.opacity = '1';
-            }, 500);
+            gameEl.classList.remove('active');
+            menuEl.classList.add('active');
             clearInterval(timerInterval);
         }
         
@@ -622,17 +625,13 @@
             currentLevel = level;
             difficultyEl.innerText = difficultyNames[level];
             
-            menuEl.style.opacity = '0';
-            setTimeout(() => {
-                menuEl.style.display = 'none';
-                gameEl.style.display = 'block';
-                setTimeout(() => gameEl.style.opacity = '1', 10);
-                
-                resetLives();
-                elapsedTime = 0;
-                generateSudokuBoard(level);
-                startTimer();
-            }, 500);
+            menuEl.classList.remove('active');
+            gameEl.classList.add('active');
+            
+            resetLives();
+            elapsedTime = 0;
+            generateSudokuBoard(level);
+            startTimer();
         }
 
         function restartGame() {
@@ -671,7 +670,7 @@
                 const row = document.createElement('tr');
                 for (let j = 0; j < 9; j++) {
                     const cell = document.createElement('td');
-                    cell.textContent = grid[i][j] !== null ? grid[i][j] : '';
+                    cell.textContent = grid[i][j] || '';
                     if (grid[i][j] === null) {
                         cell.addEventListener('click', () => selectCell(cell));
                     } else {
@@ -778,9 +777,8 @@
                 }
             }
         }
-
-        async function giveHint() {
-            await showInterstitialAd();
+        
+        function provideActualHint() {
             const emptyCells = [];
             boardEl.querySelectorAll('td').forEach(cell => {
                 if (cell.textContent === '') emptyCells.push(cell);
@@ -794,6 +792,11 @@
                 randomCell.classList.add('player-number');
                 checkWin();
             }
+        }
+
+        async function giveHint() {
+            await showInterstitialAd();
+            provideActualHint();
         }
         
         // --- Highlighting ---
@@ -933,7 +936,7 @@
         }
 
         async function updateStats(level, time, won) {
-            if (!window.vkBridge) return;
+            if (!window.vkBridge || !level) return;
             try {
                 const data = await vkBridge.send('VKWebAppStorageGet', { keys: ['sudokuStats'] });
                 const statsValue = data.keys[0].value;
